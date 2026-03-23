@@ -12,7 +12,7 @@
     <meta name="description" content="Expert Data Scientist and FinTech Analyst specializing in AI Trading Bots and Time-Series Forecasting. MBA Finance & B.Tech CS." />
     <meta name="keywords" content="Anaswar Ash, Data Scientist, FinTech Analyst, AI Engineer, Machine Learning Specialist, MQL5 Trading Bot, ARIMA LSTM Forecasting, Python Data Analysis, R Statistical Modeling, Full Stack Developer, MBA Finance UK, Computer Science Engineer, Glasgow Data Analyst, Scotland FinTech" />
     <meta name="author" content="Anaswar Ash" />
-    <link rel="canonical" href="https://anaswar-ash.dev/" />
+    <link rel="canonical" href="https://anaswar.com/" />
     <meta name="robots" content="index, follow" />
 
     <!-- Schema.org JSON-LD -->
@@ -21,13 +21,8 @@
       "@context": "https://schema.org",
       "@type": "Person",
       "name": "Anaswar Ash",
-      "url": "https://anaswar-ash.dev",
+      "url": "https://anaswar.com",
       "jobTitle": ["Data Scientist", "FinTech Analyst", "AI Engineer"],
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Glasgow",
-        "addressCountry": "UK"
-      },
       "address": {
         "@type": "PostalAddress",
         "addressLocality": "Glasgow",
@@ -44,6 +39,20 @@
       ]
     }
     </script>
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://anaswar.com/" />
+    <meta property="og:title" content="Anaswar Ash | Data Scientist & FinTech Analyst" />
+    <meta property="og:description" content="Bridging the gap between complex financial data and actionable intelligence." />
+    <meta property="og:image" content="/opengraph.jpg" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://anaswar.com/" />
+    <meta property="twitter:title" content="Anaswar Ash | Data Scientist & FinTech Analyst" />
+    <meta property="twitter:description" content="Bridging the gap between complex financial data and actionable intelligence." />
+    <meta property="twitter:image" content="/opengraph.jpg" />
 
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -79,7 +88,7 @@
         border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(8px);
       }
       #back-to-top.visible { opacity: 1; visibility: visible; }
-      #back-to-top:hover { transform: scale(1.1); filter: brightness(1.2); }
+      #back-to-top:hover { background: linear-gradient(135deg, rgba(45, 138, 106, 0.95), rgba(128, 61, 61, 0.95)); transform: scale(1.1); }
 
       /* AI Terminal */
       .ai-terminal { font-family: monospace; font-size: 0.75rem; color: var(--brand-green); background: rgba(0, 0, 0, 0.4); border-radius: 0.5rem; padding: 0.75rem; margin-top: 1rem; border: 1px solid rgba(45, 138, 106, 0.2); max-height: 200px; overflow-y: auto; }
@@ -103,7 +112,7 @@
       #footer-secrets { position: absolute; bottom: 10px; left: 20px; display: flex; gap: 15px; align-items: center; }
       #coffee-mode, #kbd-hint { opacity: 0.05; cursor: pointer; transition: all 0.3s; z-index: 10; font-size: 1.2rem; }
       #coffee-mode:hover, #kbd-hint:hover { opacity: 0.8; transform: translateY(-2px); }
-      #kbd-hint:hover::before { content: 'Press Ctrl + K'; position: absolute; bottom: 30px; left: 0; background: #2d8a6a; color: white; font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; white-space: nowrap; font-family: monospace; }
+      #kbd-hint:hover::before { content: 'Press Ctrl + K'; position: absolute; bottom: 30px; left: 0; background: var(--brand-green); color: white; font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; white-space: nowrap; font-family: monospace; }
       body.overclocked #coffee-mode { opacity: 1; filter: drop-shadow(0 0 10px var(--brand-green)); }
 
       /* Magnetic Photo */
@@ -119,13 +128,14 @@
       #konami-card { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); width: 90%; max-width: 450px; background: rgba(20, 20, 20, 0.9); border: 1px solid var(--brand-green); border-radius: 1.5rem; z-index: 10010; padding: 2.5rem; text-align: center; backdrop-filter: blur(20px); opacity: 0; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
       #konami-card.active { display: block; opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
-      /* Lightbox */
+      /* Lightbox Modal */
       #lightbox-modal { display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(10px); align-items: center; justify-content: center; padding: 2rem; }
       #lightbox-modal.active { display: flex; }
       #lightbox-modal img { max-width: 95%; max-height: 95%; border-radius: 0.75rem; }
       #lightbox-close { position: absolute; top: 1.5rem; right: 1.5rem; width: 3rem; height: 3rem; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; transition: all 0.2s; }
       #lightbox-close:hover { background: rgba(255, 255, 255, 0.2); transform: rotate(90deg); }
 
+      @media (max-width: 1024px) { div[class*="bg-background/95"], div[class*="backdrop-blur-xl"] { backdrop-filter: blur(24px) !important; background-color: rgba(10, 10, 10, 0.95) !important; } }
       html { scroll-behavior: smooth; }
     </style>
   </head>
@@ -165,31 +175,15 @@
 
       // Unified Keyboard Logic
       document.addEventListener('keydown', (e) => {
-        // Ctrl+K Palette
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-          e.preventDefault();
-          const p = document.getElementById('cmd-palette');
-          p.style.display = p.style.display === 'block' ? 'none' : 'block';
-          if (p.style.display === 'block') document.getElementById('cmd-input').focus();
-          return;
-        }
-        // Escape
-        if (e.key === 'Escape') {
-          document.getElementById('cmd-palette').style.display = 'none';
-          document.getElementById('game-modal').style.display = 'none';
-          document.getElementById('konami-card').classList.remove('active');
-          clearInterval(snakeInterval);
-          return;
-        }
-        // Data Easter Egg
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); const p = document.getElementById('cmd-palette'); p.style.display = p.style.display === 'block' ? 'none' : 'block'; if (p.style.display === 'block') document.getElementById('cmd-input').focus(); return; }
+        if (e.key === 'Escape') { document.getElementById('cmd-palette').style.display = 'none'; document.getElementById('game-modal').style.display = 'none'; document.getElementById('konami-card').classList.remove('active'); clearInterval(snakeInterval); return; }
         if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
-          typedBuffer += e.key.toLowerCase();
-          if (typedBuffer.endsWith('data')) { triggerMatrix(); typedBuffer = ""; }
+          typedBuffer += e.key.toLowerCase(); if (typedBuffer.endsWith('data')) { triggerMatrix(); typedBuffer = ""; }
           if (typedBuffer.length > 10) typedBuffer = typedBuffer.slice(1);
         }
       });
 
-      // Terminal System
+      // Terminal Logic
       function injectTerminal() {
         if (document.querySelector('.ai-terminal')) return true;
         const skillCards = document.querySelectorAll('#skills .glass-panel, #skills h3');
@@ -198,8 +192,7 @@
         if (aiCard) {
           const terminal = document.createElement('div'); terminal.className = 'ai-terminal';
           terminal.innerHTML = '<div id="terminal-content"></div><span class="terminal-cursor"></span>';
-          aiCard.appendChild(terminal);
-          startAILogs(); return true;
+          aiCard.appendChild(terminal); startAILogs(); return true;
         }
         return false;
       }
@@ -223,17 +216,14 @@
       }
 
       function triggerAnalyse() {
-        clearTimeout(terminalTypeTimer);
-        const c = document.getElementById('terminal-content'); if(!c) return;
+        clearTimeout(terminalTypeTimer); const c = document.getElementById('terminal-content'); if(!c) return;
         c.innerHTML = '<span style="color:#fff">Starting Investment Analysis [2000-2025]...</span><br/>';
         const lines = ['> loading historical_market_data.parquet...','> period: Jan 2000 - March 2025 (25 years)','> identifying volatility clusters...','> analysis: FTSE 100 cyclical trends detected.','> result: optimized timing strategy found.','> alpha: +14.2% return vs market baseline.','> sharpe_ratio: 1.84 (Model v4.2)','<span style="color:#fff">ANALYSIS COMPLETE. REPORT READY.</span>'];
-        let i = 0;
-        const interval = setInterval(() => { if(i < lines.length) { c.innerHTML += lines[i] + '<br/>'; i++; c.scrollTop = c.scrollHeight; } else { clearInterval(interval); setTimeout(startAILogs, 10000); } }, 600);
+        let i = 0; const interval = setInterval(() => { if(i < lines.length) { c.innerHTML += lines[i] + '<br/>'; i++; c.scrollTop = c.scrollHeight; } else { clearInterval(interval); setTimeout(startAILogs, 10000); } }, 600);
       }
 
       function handleBashCommand(cmd) {
-        const c = document.getElementById('terminal-content');
-        c.innerHTML += `<span style="color:#aaa">anaswar@ash:~$ ${cmd}</span><br/>`;
+        const c = document.getElementById('terminal-content'); c.innerHTML += `<span style="color:#aaa">anaswar@ash:~$ ${cmd}</span><br/>`;
         switch(cmd) {
           case 'ls': c.innerHTML += 'about.txt  projects/  skills/  cv.pdf<br/>'; break;
           case 'whoami': c.innerHTML += 'Data Scientist | AI Engineer | Ash<br/>'; break;
@@ -245,7 +235,7 @@
         c.scrollTop = c.scrollHeight;
       }
 
-      // Palette Logic
+      // Palette
       document.getElementById('cmd-input')?.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           const val = e.target.value.toLowerCase().trim();
@@ -256,7 +246,7 @@
           else if (val === '/analyse') { const s = document.getElementById('skills'); if (s) window.scrollTo({ top: s.offsetTop - 80, behavior: "smooth" }); triggerAnalyse(); }
           else if (val === '/matrix') triggerMatrix();
           else if (val === '/coffee') { isOverclocked = !isOverclocked; document.body.classList.toggle('overclocked', isOverclocked); }
-          else { const m = ['about', 'skills', 'projects', 'experience', 'education', 'certifications', 'hobbies', 'contact'].find(s => val === `/${s}`); if (m) window.scrollTo({ top: document.getElementById(m).offsetTop - 80, behavior: "smooth" }); }
+          else { const m = ['hero', 'about', 'skills', 'projects', 'experience', 'education', 'certifications', 'hobbies', 'contact'].find(s => val === `/${s}`); if (m) window.scrollTo({ top: document.getElementById(m).offsetTop - 80, behavior: "smooth" }); }
           if (val !== '/bash') { document.getElementById('cmd-palette').style.display='none'; e.target.value = ''; }
         }
       });
@@ -291,7 +281,6 @@
         snakeInterval = setInterval(draw, 100);
       }
 
-      // Other logic
       function injectPulse() {
         if (document.getElementById('financial-pulse')) return true;
         const footer = document.querySelector('footer'); if (!footer) return false;
@@ -348,12 +337,11 @@
       document.addEventListener('mouseout', (e) => { if (e.target.closest('a') || e.target.closest('button')) cur.classList.remove('hover'); });
       window.addEventListener('scroll', () => {
         const sects = ['hero', 'about', 'skills', 'projects', 'experience', 'education', 'certifications', 'hobbies', 'contact'], btt = document.getElementById('back-to-top');
-        let c = ''; sects.forEach(id => { const el = document.getElementById(id); if (el && pageYOffset >= el.offsetTop-150) c = id; });
+        let c = ''; sects.forEach(id => { const el = document.getElementById(id); if (el && window.pageYOffset >= el.offsetTop-150) c = id; });
         document.querySelectorAll('nav a').forEach(a => { a.classList.toggle('nav-link-active', a.getAttribute('href') === `#${c}`); });
         if (window.pageYOffset > 500) btt.classList.add('visible'); else btt.classList.remove('visible');
       });
 
-      // Binary & Click logic
       let logoClickCounter = 0, logoTimer;
       document.addEventListener('mousedown', (e) => {
         const path = e.composedPath(); const isLogo = path.some(el => el.innerText && el.innerText.includes('ASH') && el.innerText.includes('DEV'));
@@ -372,6 +360,13 @@
           }
         }
       });
+
+      const konami = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+      let kIndex = 0;
+      document.addEventListener('keydown', (e) => { if (e.key === konami[kIndex]) { kIndex++; if (kIndex === konami.length) { 
+        const card = document.getElementById('konami-card'); const quotes = ["The machine does not separate data from life; it only clarifies the patterns we are too busy to see.","Optimization is not just about speed; it is about finding the shortest path between a question and its truth.","In the stream of binary, the only constant is change. Adapt the model, or lose the signal."];
+        document.getElementById('quote-text').innerText = quotes[Math.floor(Math.random()*quotes.length)]; card.classList.add('active'); kIndex = 0; 
+      } } else { kIndex = 0; } });
     </script>
   </body>
 </html>
