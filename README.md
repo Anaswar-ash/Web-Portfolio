@@ -3,7 +3,7 @@
 A world-class, high-performance professional portfolio designed for the technical intersection of Finance, AI, and Full-Stack Engineering.
 
 ## 🚀 Live Link
-[https://anaswar-ash.dev/](https://anaswar-ash.dev/) *(Update with your actual Vercel/Custom link)*
+[https://anaswar-ash.dev/](https://anaswar-ash.dev/) *
 
 ## 🛠 Technical Stack
 - **Frontend:** React (TypeScript), Tailwind CSS, Framer Motion
