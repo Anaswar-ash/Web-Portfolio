@@ -1,0 +1,32 @@
+======================================
+  ANASWAR (ASH) T, PORTFOLIO WEBSITE
+======================================
+
+HOW TO RUN LOCALLY
+------------------
+
+OPTION 1, Using the included scripts (easiest)
+  Mac / Linux:
+    1. Open a Terminal in this folder
+    2. Run:  bash start.sh
+    3. Open your browser at:  http://localhost:8080
+
+  Windows:
+    1. Double-click  start.bat
+    2. Open your browser at:  http://localhost:8080
+
+OPTION 2, Using Node.js (if you have it installed)
+    1. Open a terminal in this folder
+    2. Run:  npx serve .
+    3. Open the URL shown in the terminal
+
+OPTION 3, Using VS Code Live Server
+    1. Open this folder in VS Code
+    2. Install the "Live Server" extension
+    3. Right-click index.html → "Open with Live Server"
+
+NOTE: Do NOT open index.html directly by double-clicking it.
+The app must be served over HTTP (any of the options above)
+to load correctly.
+
+======================================
