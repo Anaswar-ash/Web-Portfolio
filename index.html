@@ -179,7 +179,7 @@
     
     <div id="cmd-palette">
       <input type="text" id="cmd-input" placeholder="Type a command (e.g. /projects)..." autocomplete="off">
-      <div class="cmd-hint">Try: /about, /projects, /whois, /analyse, /bash, /snake, /coffee</div>
+      <div class="cmd-hint">Try: /about, /projects, /whois, /analyse, /bash, /snake, /tetris, /coffee</div>
     </div>
 
     <div id="game-modal">
@@ -195,6 +195,21 @@
       </div>
       <div id="game-container"><canvas id="game-canvas" width="400" height="400"></canvas></div>
       <div class="cmd-hint" style="margin-top:1.5rem; color:#666; text-align:center;">Use ARROW KEYS to move. ESC to exit.</div>
+    </div>
+
+    <div id="tetris-modal" style="display: none; position: fixed; inset: 0; z-index: 10005; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); align-items: center; justify-content: center; flex-direction: column;">
+      <div id="tetris-stats" style="display:flex; flex-direction:column; gap:10px; margin-bottom: 1.5rem; width: 300px;">
+        <div style="display:flex; justify-content: space-between; align-items: center;">
+          <div id="tetris-score" style="color:var(--brand-green); font-family: monospace; font-size: 1.4rem; font-weight: bold;">LINES: 0</div>
+          <div id="tetris-high-score" style="color:#aaa; font-family: monospace; font-size: 1rem;">MAX: 0</div>
+        </div>
+        <div id="tetris-global-leaders" style="background: rgba(45, 138, 106, 0.1); border-radius: 8px; padding: 10px; border: 1px solid rgba(45, 138, 106, 0.2);">
+          <div style="font-size: 0.7rem; color: var(--brand-green); font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Global Tetris Logs [Top 3]</div>
+          <div id="tetris-leaderboard-list" style="font-family: monospace; font-size: 0.75rem; color: #888;">Connecting to cloud...</div>
+        </div>
+      </div>
+      <div id="tetris-container" style="border: 2px solid var(--brand-green); background: #000; box-shadow: 0 0 30px rgba(45, 138, 106, 0.3);"><canvas id="tetris-canvas" width="240" height="480"></canvas></div>
+      <div class="cmd-hint" style="margin-top:1.5rem; color:#666; text-align:center;">ARROWS to move/rotate. SPACE to drop. ESC to exit.</div>
     </div>
 
     <div id="konami-card">
@@ -215,7 +230,14 @@
       // Unified Keyboard Logic
       document.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); const p = document.getElementById('cmd-palette'); p.style.display = p.style.display === 'block' ? 'none' : 'block'; if (p.style.display === 'block') document.getElementById('cmd-input').focus(); return; }
-        if (e.key === 'Escape') { document.getElementById('cmd-palette').style.display = 'none'; document.getElementById('game-modal').style.display = 'none'; document.getElementById('konami-card').classList.remove('active'); clearInterval(snakeInterval); return; }
+        if (e.key === 'Escape') { 
+          document.getElementById('cmd-palette').style.display = 'none'; 
+          document.getElementById('game-modal').style.display = 'none'; 
+          document.getElementById('tetris-modal').style.display = 'none';
+          document.getElementById('konami-card').classList.remove('active'); 
+          clearInterval(snakeInterval); 
+          return; 
+        }
         if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
           typedBuffer += e.key.toLowerCase(); if (typedBuffer.endsWith('data')) { triggerMatrix(); typedBuffer = ""; }
           if (typedBuffer.length > 10) typedBuffer = typedBuffer.slice(1);
@@ -281,6 +303,7 @@
           if (isBashMode) { handleBashCommand(val); e.target.value = ''; return; }
           if (val === '/bash') { isBashMode = true; clearTimeout(terminalTypeTimer); const c = document.getElementById('terminal-content'); c.innerHTML = '<span style="color:#fff">bash-4.2$ login: anaswar_ash</span><br/>'; e.target.placeholder = "BASH: type a command..."; }
           else if (val === '/snake') startSnake();
+          else if (val === '/tetris') startTetris();
           else if (val === '/whois') { clearTimeout(terminalTypeTimer); const c = document.getElementById('terminal-content'); c.innerHTML = '<span style="color:#fff">/whois requested...</span><br/>'; const d = { name: "Anaswar Ash", role: "Data Scientist & AI Engineer" }; setTimeout(() => { c.innerHTML += `<pre style="font-size:0.6rem; color:#fff">${JSON.stringify(d, null, 2)}</pre>`; setTimeout(startAILogs, 10000); }, 500); }
           else if (val === '/analyse') { const s = document.getElementById('skills'); if (s) window.scrollTo({ top: s.offsetTop - 80, behavior: "smooth" }); triggerAnalyse(); }
           else if (val === '/matrix') triggerMatrix();
@@ -289,6 +312,106 @@
           if (val !== '/bash') { document.getElementById('cmd-palette').style.display='none'; e.target.value = ''; }
         }
       });
+
+      // Tetris Arcade
+      async function updateTetrisLeaderboard() {
+        const list = document.getElementById('tetris-leaderboard-list'); if (!list) return;
+        try {
+          const res = await fetch('https://www.dreamlo.com/lb/67e1a49f8ad798303890fbd4/json');
+          const data = await res.json();
+          const scores = data.dreamlo.leaderboard.entry;
+          const top = Array.isArray(scores) ? scores.slice(0, 3) : (scores ? [scores] : []);
+          list.innerHTML = top.map((s, i) => `<div style="display:flex; justify-content:space-between; margin-bottom:2px;"><span>${i+1}. ${s.name}</span><span>${s.score}</span></div>`).join('') || 'No cloud logs yet.';
+        } catch (e) { list.innerText = 'Offline Mode Active'; }
+      }
+
+      function startTetris() {
+        document.getElementById('tetris-modal').style.display = 'flex';
+        updateTetrisLeaderboard();
+        const canvas = document.getElementById('tetris-canvas'), ctx = canvas.getContext('2d'), scoreEl = document.getElementById('tetris-score'), highScoreEl = document.getElementById('tetris-high-score');
+        let highScore = parseInt(localStorage.getItem('tetris-high-score') || '0');
+        highScoreEl.innerText = `MAX: ${highScore}`;
+        const COLS = 10, ROWS = 20, SIZE = 24;
+        let grid = Array(ROWS).fill().map(() => Array(COLS).fill(0)), score = 0, isGameOver = false, dropCounter = 0, dropInterval = 1000, lastTime = 0;
+        const pieces = 'ILJOTSZ', colors = ['#2d8a6a', '#1a5c46', '#3db38a', '#144333', '#4de6b0', '#247056', '#2d8a6a'];
+        let player = { pos: {x: 0, y: 0}, matrix: null };
+
+        function createPiece(type) {
+          if (type === 'I') return [[0,1,0,0],[0,1,0,0],[0,1,0,0],[0,1,0,0]];
+          if (type === 'L') return [[0,2,0],[0,2,0],[0,2,2]];
+          if (type === 'J') return [[0,3,0],[0,3,0],[3,3,0]];
+          if (type === 'O') return [[4,4],[4,4]];
+          if (type === 'Z') return [[5,5,0],[0,5,5],[0,0,0]];
+          if (type === 'S') return [[0,6,6],[6,6,0],[0,0,0]];
+          if (type === 'T') return [[0,7,0],[7,7,7],[0,0,0]];
+        }
+
+        function drawMatrix(matrix, offset) {
+          matrix.forEach((row, y) => { row.forEach((value, x) => {
+            if (value !== 0) { ctx.fillStyle = colors[value-1]; ctx.fillRect((x + offset.x) * SIZE, (y + offset.y) * SIZE, SIZE-1, SIZE-1); }
+          }); });
+        }
+
+        function merge(grid, player) { player.matrix.forEach((row, y) => { row.forEach((value, x) => { if (value !== 0) grid[y + player.pos.y][x + player.pos.x] = value; }); }); }
+        function collide(grid, player) {
+          const [m, o] = [player.matrix, player.pos];
+          for (let y = 0; y < m.length; ++y) { for (let x = 0; x < m[y].length; ++x) { if (m[y][x] !== 0 && (grid[y + o.y] && grid[y + o.y][x + o.x]) !== 0) return true; } }
+          return false;
+        }
+
+        function rotate(matrix) { for (let y = 0; y < matrix.length; ++y) { for (let x = 0; x < y; ++x) { [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]]; } } matrix.forEach(row => row.reverse()); }
+
+        async function playerDrop() {
+          player.pos.y++;
+          if (collide(grid, player)) {
+            player.pos.y--; merge(grid, player); gridSweep(); playerReset();
+            if (collide(grid, player)) {
+              isGameOver = true;
+              if (score > highScore) { highScore = score; localStorage.setItem('tetris-high-score', highScore.toString()); highScoreEl.innerText = `MAX: ${highScore}`; }
+              ctx.fillStyle = 'rgba(0,0,0,0.85)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+              ctx.fillStyle = '#ff4444'; ctx.font = '24px monospace'; ctx.textAlign = 'center'; ctx.fillText('TERMINATED', canvas.width/2, 200);
+              ctx.font = '12px monospace'; ctx.fillStyle='#fff'; ctx.fillText('PRESS R TO REBOOT', canvas.width/2, 260);
+              if (score > 0) {
+                const name = prompt("TETRIS SEQUENCE COMPLETE. ID for Global Registry:", "DEV_" + Math.floor(Math.random()*999));
+                if (name) { await fetch(`https://www.dreamlo.com/lb/P03v_i30z0C-XWunxHqT6AyG6L0vKbe0yW0U7Lw0i-7A/add/${encodeURIComponent(name)}/${score}`); updateTetrisLeaderboard(); }
+              }
+            }
+          }
+          dropCounter = 0;
+        }
+
+        function playerReset() { player.matrix = createPiece(pieces[pieces.length * Math.random() | 0]); player.pos.y = 0; player.pos.x = (COLS / 2 | 0) - (player.matrix[0].length / 2 | 0); }
+        function gridSweep() {
+          let rowCount = 1;
+          outer: for (let y = ROWS - 1; y > 0; --y) {
+            for (let x = 0; x < COLS; ++x) { if (grid[y][x] === 0) continue outer; }
+            const row = grid.splice(y, 1)[0].fill(0); grid.unshift(row); ++y; score += rowCount * 10; rowCount *= 2;
+          }
+          scoreEl.innerText = `LINES: ${score}`;
+        }
+
+        function update(time = 0) {
+          if (isGameOver || document.getElementById('tetris-modal').style.display === 'none') return;
+          const deltaTime = time - lastTime; lastTime = time; dropCounter += deltaTime;
+          if (dropCounter > dropInterval) playerDrop();
+          ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+          drawMatrix(grid, {x: 0, y: 0}); drawMatrix(player.matrix, player.pos);
+          requestAnimationFrame(update);
+        }
+
+        playerReset(); update();
+        const tetrisKey = (e) => {
+          if (isGameOver && e.key.toLowerCase() === 'r') { startTetris(); return; }
+          if (isGameOver || document.getElementById('tetris-modal').style.display === 'none') return;
+          if (e.key === 'ArrowLeft') { player.pos.x--; if (collide(grid, player)) player.pos.x++; }
+          else if (e.key === 'ArrowRight') { player.pos.x++; if (collide(grid, player)) player.pos.x--; }
+          else if (e.key === 'ArrowDown') playerDrop();
+          else if (e.key === 'ArrowUp') { const oldX = player.pos.x; rotate(player.matrix); while (collide(grid, player)) { player.pos.x += player.pos.x > COLS/2 ? -1 : 1; if (Math.abs(player.pos.x - oldX) > 4) { rotate(player.matrix); rotate(player.matrix); rotate(player.matrix); player.pos.x = oldX; break; } } }
+          else if (e.key === ' ') { while (!collide(grid, player)) { player.pos.y++; } player.pos.y--; playerDrop(); }
+        };
+        document.addEventListener('keydown', tetrisKey);
+        const escapeCheck = setInterval(() => { if (document.getElementById('tetris-modal').style.display === 'none') { document.removeEventListener('keydown', tetrisKey); clearInterval(escapeCheck); isGameOver = true; } }, 100);
+      }
 
       // Snake Arcade
       async function updateGlobalLeaderboard() {
