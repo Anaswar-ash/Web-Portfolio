@@ -514,26 +514,28 @@
         async function updateMarketData() {
           const ticker = document.getElementById('market-ticker');
           try {
-            const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbols=["BTCUSDT","ETHUSDT"]', { signal: AbortSignal.timeout(5000) });
-            if (!res.ok) throw new Error();
-            const data = await res.json();
+            // Fetch Prices
+            const priceRes = await fetch('https://api.binance.com/api/v3/ticker/price?symbols=["BTCUSDT","ETHUSDT"]', { signal: AbortSignal.timeout(5000) });
+            const priceData = await priceRes.json();
+            
+            // Fetch Real News from CryptoPanic (via public proxy)
+            const newsRes = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://cryptopanic.com/news/rss/', { signal: AbortSignal.timeout(5000) });
+            const newsData = await newsRes.json();
+            const headlines = newsData.items ? newsData.items.map(i => i.title.toUpperCase()) : [];
+            
             lastUpdate = Date.now();
             
-            const btc = `$${parseFloat(data[0].price).toLocaleString()}`;
-            const eth = `$${parseFloat(data[1].price).toLocaleString()}`;
+            const btc = `$${parseFloat(priceData[0].price).toLocaleString()}`;
+            const eth = `$${parseFloat(priceData[1].price).toLocaleString()}`;
             document.getElementById('tick-btc').innerText = btc;
             document.getElementById('tick-btc2').innerText = btc;
             document.getElementById('tick-eth').innerText = eth;
             document.getElementById('tick-eth2').innerText = eth;
             
-            const news = [
-              "QUANTUM COMPUTING BREAKTHROUGH THREATENS ENCRYPTION STANDARDS",
-              "CENTRAL BANKS SIGNAL SHIFT TOWARDS DIGITAL CURRENCY ADOPTION",
-              "AI-DRIVEN TRADING ALGORITHMS HIT RECORD VOLUME IN EUROPEAN MARKETS",
-              "GLOBAL TECH INDEX SURGES AS SEMICONDUCTOR DEMAND PEAKS",
-              "DECENTRALIZED FINANCE PROTOCOLS SEE 24% INCREASE IN TOTAL VALUE LOCKED"
-            ];
-            document.getElementById('tick-news').innerText = news[Math.floor(Math.random() * news.length)];
+            if (headlines.length > 0) {
+              const newsCycle = headlines.join("  |  ");
+              document.getElementById('tick-news').innerText = newsCycle;
+            }
           } catch (e) {
             const now = Date.now();
             if (now - lastUpdate > 30000) { // 30 seconds
@@ -547,7 +549,6 @@
               ];
               const joke = jokes[Math.floor(Math.random() * jokes.length)];
               ticker.innerHTML = `<div class="ticker-item" style="color:#ff4444"><span>STATUS:</span> ${joke}</div>`;
-              // Add a second item for seamless loop even in error state
               ticker.innerHTML += `<div class="ticker-item" style="color:#ff4444"><span>STATUS:</span> ${joke}</div>`;
             }
           }
