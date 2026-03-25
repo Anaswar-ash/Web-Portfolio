@@ -510,10 +510,15 @@
         `;
         footer.style.position = 'relative'; footer.insertBefore(pulseDiv, footer.firstChild);
 
+        let lastUpdate = 0;
         async function updateMarketData() {
+          const ticker = document.getElementById('market-ticker');
           try {
-            const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbols=["BTCUSDT","ETHUSDT"]');
+            const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbols=["BTCUSDT","ETHUSDT"]', { signal: AbortSignal.timeout(5000) });
+            if (!res.ok) throw new Error();
             const data = await res.json();
+            lastUpdate = Date.now();
+            
             const btc = `$${parseFloat(data[0].price).toLocaleString()}`;
             const eth = `$${parseFloat(data[1].price).toLocaleString()}`;
             document.getElementById('tick-btc').innerText = btc;
@@ -529,7 +534,23 @@
               "DECENTRALIZED FINANCE PROTOCOLS SEE 24% INCREASE IN TOTAL VALUE LOCKED"
             ];
             document.getElementById('tick-news').innerText = news[Math.floor(Math.random() * news.length)];
-          } catch (e) { console.log("Market feed delay..."); }
+          } catch (e) {
+            const now = Date.now();
+            if (now - lastUpdate > 30000) { // 30 seconds
+              const jokes = [
+                "ERROR 404: INTERNET.EXE HAS LEFT THE CHAT. GO TOUCH SOME GRASS.",
+                "CONNECTION LOST: THE ALGORITHMS ARE CURRENTLY ON A COFFEE BREAK.",
+                "MARKET DATA OFFLINE: EVEN THE BOTS NEED SLEEP SOMETIMES.",
+                "404: WEALTH NOT FOUND. PLEASE CHECK YOUR ROUTER OR YOUR LUCK.",
+                "SIGNAL INTERRUPTED: THE FED CUT OUR ETHERNET CABLE BY MISTAKE.",
+                "OFFLINE: TRADING FLOOR IS CURRENTLY BEING VACUUMED."
+              ];
+              const joke = jokes[Math.floor(Math.random() * jokes.length)];
+              ticker.innerHTML = `<div class="ticker-item" style="color:#ff4444"><span>STATUS:</span> ${joke}</div>`;
+              // Add a second item for seamless loop even in error state
+              ticker.innerHTML += `<div class="ticker-item" style="color:#ff4444"><span>STATUS:</span> ${joke}</div>`;
+            }
+          }
         }
         updateMarketData(); setInterval(updateMarketData, 20000);
         return true;
