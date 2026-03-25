@@ -129,9 +129,13 @@
       #matrix-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9998; background: rgba(0, 0, 0, 0.9); opacity: 0; transition: opacity 0.5s ease; display: none; }
       #matrix-overlay.active { display: block; opacity: 1; }
 
-      /* Financial Pulse */
-      #financial-pulse { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.6; overflow: hidden; z-index: 1; }
-      #pulse-canvas { width: 100%; height: 100%; display: block; }
+      /* Market Pulse Billboard */
+      #financial-pulse { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.8; overflow: hidden; z-index: 1; display: flex; align-items: center; }
+      .ticker-wrap { width: 100%; overflow: hidden; height: 3rem; background: rgba(0,0,0,0.4); border-top: 1px solid rgba(45, 138, 106, 0.3); border-bottom: 1px solid rgba(45, 138, 106, 0.3); display: flex; align-items: center; }
+      .ticker { display: inline-block; white-space: nowrap; padding-right: 100%; animation: ticker 60s linear infinite; }
+      .ticker-item { display: inline-block; padding: 0 2rem; color: var(--brand-green); font-family: monospace; font-size: 0.8rem; letter-spacing: 1px; }
+      .ticker-item span { color: #888; margin-right: 0.5rem; }
+      @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
       /* Command Palette */
       #cmd-palette { display: none; position: fixed; top: 20%; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; background: rgba(10, 10, 10, 0.95); border: 1px solid var(--brand-green); border-radius: 1rem; z-index: 10001; padding: 1rem; box-shadow: 0 20px 50px rgba(0,0,0,0.5); backdrop-filter: blur(15px); }
@@ -478,20 +482,48 @@
         const kbd = document.createElement('div'); kbd.id = 'kbd-hint'; kbd.innerHTML = '⌨️';
         kbd.onclick = () => { document.getElementById('cmd-palette').style.display = 'block'; document.getElementById('cmd-input').focus(); };
         secrets.appendChild(kbd); secrets.appendChild(coffee); footer.appendChild(secrets);
+        
         const pulseDiv = document.createElement('div'); pulseDiv.id = 'financial-pulse';
-        pulseDiv.innerHTML = '<canvas id="pulse-canvas"></canvas>';
+        pulseDiv.innerHTML = `
+          <div class="ticker-wrap">
+            <div class="ticker" id="market-ticker">
+              <div class="ticker-item"><span>BTC/USD</span> <span id="tick-btc">LOADING...</span></div>
+              <div class="ticker-item"><span>ETH/USD</span> <span id="tick-eth">LOADING...</span></div>
+              <div class="ticker-item"><span>NASDAQ</span> <span style="color:#4de6b0">+1.24%</span></div>
+              <div class="ticker-item"><span>S&P 500</span> <span style="color:#4de6b0">+0.82%</span></div>
+              <div class="ticker-item"><span>GOLD</span> <span style="color:#4de6b0">$2,342.10</span></div>
+              <div class="ticker-item"><span>NEWS:</span> <span id="tick-news">CONNECTING TO GLOBAL FINANCIAL NETWORK...</span></div>
+              <!-- Duplicate for seamless loop -->
+              <div class="ticker-item"><span>BTC/USD</span> <span id="tick-btc2">LOADING...</span></div>
+              <div class="ticker-item"><span>ETH/USD</span> <span id="tick-eth2">LOADING...</span></div>
+            </div>
+          </div>
+        `;
         footer.style.position = 'relative'; footer.insertBefore(pulseDiv, footer.firstChild);
-        const canvas = document.getElementById('pulse-canvas'), ctx = canvas.getContext('2d');
-        let width = canvas.width = window.innerWidth, height = canvas.height = footer.offsetHeight || 100;
-        const points = []; for(let i=0; i<100; i++) points.push(height/2);
-        function animate() {
-          ctx.clearRect(0, 0, width, height); ctx.strokeStyle = '#2d8a6a'; ctx.lineWidth = isOverclocked ? 3 : 1.5; ctx.beginPath(); ctx.moveTo(0, points[0]);
-          points.shift(); points.push(points[points.length-1] + (Math.random()-0.5)*(isOverclocked?20:8));
-          points[99] = Math.max(height*0.1, Math.min(height*0.9, points[99]));
-          for(let i=0; i<100; i++) ctx.lineTo((i/99)*width, points[i]);
-          ctx.stroke(); requestAnimationFrame(animate);
+
+        async function updateMarketData() {
+          try {
+            const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbols=["BTCUSDT","ETHUSDT"]');
+            const data = await res.json();
+            const btc = `$${parseFloat(data[0].price).toLocaleString()}`;
+            const eth = `$${parseFloat(data[1].price).toLocaleString()}`;
+            document.getElementById('tick-btc').innerText = btc;
+            document.getElementById('tick-btc2').innerText = btc;
+            document.getElementById('tick-eth').innerText = eth;
+            document.getElementById('tick-eth2').innerText = eth;
+            
+            const news = [
+              "QUANTUM COMPUTING BREAKTHROUGH THREATENS ENCRYPTION STANDARDS",
+              "CENTRAL BANKS SIGNAL SHIFT TOWARDS DIGITAL CURRENCY ADOPTION",
+              "AI-DRIVEN TRADING ALGORITHMS HIT RECORD VOLUME IN EUROPEAN MARKETS",
+              "GLOBAL TECH INDEX SURGES AS SEMICONDUCTOR DEMAND PEAKS",
+              "DECENTRALIZED FINANCE PROTOCOLS SEE 24% INCREASE IN TOTAL VALUE LOCKED"
+            ];
+            document.getElementById('tick-news').innerText = news[Math.floor(Math.random() * news.length)];
+          } catch (e) { console.log("Market feed delay..."); }
         }
-        animate(); return true;
+        updateMarketData(); setInterval(updateMarketData, 20000);
+        return true;
       }
 
       function initMagnetic() {
