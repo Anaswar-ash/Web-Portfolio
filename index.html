@@ -83,26 +83,6 @@
       :root { --brand-green: #2d8a6a; --overclock-speed: 1; --glow-intensity: 1; }
       body.overclocked { --overclock-speed: 3; --glow-intensity: 2; }
 
-      /* Custom Cursor */
-      #custom-cursor {
-        width: 32px; height: 32px; 
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M8 4l15 10-6 2 7 10-4 2.5-7-10-5 6V4z' fill='%232d8a6a' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E");
-        background-size: contain; background-repeat: no-repeat;
-        position: fixed; pointer-events: none; z-index: 10000; display: none;
-        transition: transform 0.2s cubic-bezier(0.19, 1, 0.22, 1);
-      }
-      #custom-cursor::after {
-        content: ''; position: absolute; inset: 0;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M8 0v2M5 1l1.5 1.5M11 1l-1.5 1.5M4 4h-2M12 4h2' stroke='%232d8a6a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-        background-size: contain; background-repeat: no-repeat;
-        opacity: 0; transition: opacity 0.2s ease-in-out;
-      }
-      @media (hover: hover) and (pointer: fine) { 
-        #custom-cursor { display: block; } 
-        * { cursor: none !important; } 
-      }
-      #custom-cursor.hover { transform: scale(0.7); filter: drop-shadow(0 0 8px rgba(45, 138, 106, 0.5)); }
-      #custom-cursor.hover::after { opacity: 1; }
 
       /* Scroll-Spy */
       .nav-link-active { color: var(--brand-green) !important; }
@@ -180,11 +160,62 @@
 
       @media (max-width: 1024px) { div[class*="bg-background/95"], div[class*="backdrop-blur-xl"] { backdrop-filter: blur(24px) !important; background-color: rgba(10, 10, 10, 0.95) !important; } }
       html { scroll-behavior: smooth; }
+
+      /* Photography Button */
+      .photography-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.75rem;
+        background: rgba(45, 138, 106, 0.1);
+        border: 1px solid rgba(45, 138, 106, 0.2);
+        color: #2d8a6a;
+        font-family: inherit;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-top: 1.5rem;
+        cursor: pointer;
+      }
+      .photography-btn:hover {
+        background: #2d8a6a;
+        color: #0a0a0a;
+        border-color: #2d8a6a;
+        box-shadow: 0 0 15px rgba(45, 138, 106, 0.4);
+        transform: translateY(-2px);
+      }
+      .photography-btn svg {
+        transition: transform 0.3s ease;
+      }
+      .photography-btn:hover svg {
+        transform: translateX(4px);
+      }
+
+      .hidden-view {
+        display: none !important;
+      }
+      #photography-frame-container {
+        display: none;
+        position: fixed;
+        top: 5rem;
+        left: 0;
+        width: 100%;
+        height: calc(100vh - 5rem);
+        background: #0c100e;
+        z-index: 10;
+      }
+      #photography-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
     </style>
   </head>
   <body>
     <div id="root"></div>
-    <div id="custom-cursor"></div>
+
     <div id="matrix-overlay"><canvas id="matrix-canvas"></canvas></div>
     <div id="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
@@ -582,14 +613,13 @@
       }
 
       window.addEventListener('load', () => { const retry = setInterval(() => { if (injectTerminal() && injectPulse() && initMagnetic()) clearInterval(retry); }, 500); setTimeout(() => clearInterval(retry), 8000); });
-      const cur = document.getElementById('custom-cursor');
-      document.addEventListener('mousemove', (e) => { cur.style.left = e.clientX + 'px'; cur.style.top = e.clientY + 'px'; });
-      document.addEventListener('mouseover', (e) => { if (e.target.closest('a') || e.target.closest('button')) cur.classList.add('hover'); });
-      document.addEventListener('mouseout', (e) => { if (e.target.closest('a') || e.target.closest('button')) cur.classList.remove('hover'); });
+
       window.addEventListener('scroll', () => {
+        const frameContainer = document.getElementById('photography-frame-container');
+        if (frameContainer && frameContainer.style.display === 'block') return;
         const sects = ['hero', 'about', 'skills', 'projects', 'experience', 'education', 'certifications', 'hobbies', 'contact'], btt = document.getElementById('back-to-top');
         let c = ''; sects.forEach(id => { const el = document.getElementById(id); if (el && window.pageYOffset >= el.offsetTop-150) c = id; });
-        document.querySelectorAll('nav a').forEach(a => { a.classList.toggle('nav-link-active', a.getAttribute('href') === `#${c}`); });
+        document.querySelectorAll('a[href^="#"]').forEach(a => { a.classList.toggle('nav-link-active', a.getAttribute('href') === `#${c}`); });
         if (window.pageYOffset > 500) btt.classList.add('visible'); else btt.classList.remove('visible');
       });
 
@@ -603,11 +633,131 @@
       } }, true);
 
       function closeLightbox() { document.getElementById('lightbox-modal').classList.remove('active'); document.body.style.overflow = ''; }
+      // Photography Iframe Container Creation
+      function initPhotographyFrame() {
+        let frameContainer = document.getElementById('photography-frame-container');
+        if (!frameContainer) {
+          frameContainer = document.createElement('div');
+          frameContainer.id = 'photography-frame-container';
+          
+          const iframe = document.createElement('iframe');
+          iframe.id = 'photography-iframe';
+          iframe.src = 'photography/index.html';
+          
+          frameContainer.appendChild(iframe);
+          document.body.appendChild(frameContainer);
+        }
+        
+        // Handle page load with active #photography hash
+        if (window.location.hash === '#photography') {
+          const sections = ['hero', 'about', 'skills', 'projects', 'experience', 'education', 'certifications', 'hobbies', 'contact'];
+          sections.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('hidden-view');
+          });
+          const footer = document.querySelector('footer');
+          if (footer) footer.classList.add('hidden-view');
+          
+          frameContainer.style.display = 'block';
+          window.scrollTo(0, 0);
+          document.body.style.overflow = 'hidden';
+          
+          // Briefly wait for React navigation nodes to render, then highlight active link
+          setTimeout(() => {
+            document.querySelectorAll('a[href^="#"]').forEach(a => {
+              a.classList.toggle('nav-link-active', a.getAttribute('href') === '#photography');
+            });
+          }, 200);
+        }
+      }
+      window.addEventListener('DOMContentLoaded', initPhotographyFrame);
+
+      // Listen for message from photography page inside the iframe
+      window.addEventListener('message', (e) => {
+        if ((e.origin === window.location.origin || e.origin === 'http://localhost:5173') && e.data === 'close-photography') {
+          // Restore sections
+          const sections = ['hero', 'about', 'skills', 'projects', 'experience', 'education', 'certifications', 'hobbies', 'contact'];
+          sections.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('hidden-view');
+          });
+          const footer = document.querySelector('footer');
+          if (footer) footer.classList.remove('hidden-view');
+          
+          const frameContainer = document.getElementById('photography-frame-container');
+          if (frameContainer) frameContainer.style.display = 'none';
+          document.body.style.overflow = '';
+          
+          // Reset hash and scroll to hobbies
+          window.location.hash = 'hobbies';
+          const hobbiesEl = document.getElementById('hobbies');
+          if (hobbiesEl) {
+            window.scrollTo({ top: hobbiesEl.getBoundingClientRect().top + window.scrollY - 80, behavior: "smooth" });
+          }
+        }
+      });
+
       document.addEventListener('click', (e) => {
         const img = e.target.closest('img'); if (img && img.src.includes('DSC')) { document.getElementById('lightbox-img').src = img.src; document.getElementById('lightbox-modal').classList.add('active'); document.body.style.overflow = 'hidden'; e.stopPropagation(); }
-        const link = e.target.closest('a'); if (link && link.hash && link.hash.startsWith('#')) {
-          const el = document.getElementById(link.hash.substring(1)); if (el && link.hash !== "#") { e.preventDefault(); const tb = document.querySelector('button[aria-label="Toggle menu"]'); if (tb && (tb.innerText.includes('X') || tb.innerHTML.includes('svg')) && window.innerWidth < 1024) tb.click();
-            setTimeout(() => { window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: "smooth" }); }, 280);
+        const link = e.target.closest('a');
+        if (link && link.hash && link.hash.startsWith('#')) {
+          const hash = link.hash;
+          const sections = ['hero', 'about', 'skills', 'projects', 'experience', 'education', 'certifications', 'hobbies', 'contact'];
+          
+          if (hash === '#photography') {
+            e.preventDefault();
+            // Hide other sections and footer
+            sections.forEach(id => {
+              const el = document.getElementById(id);
+              if (el) el.classList.add('hidden-view');
+            });
+            const footer = document.querySelector('footer');
+            if (footer) footer.classList.add('hidden-view');
+            
+            // Show iframe
+            let frameContainer = document.getElementById('photography-frame-container');
+            if (frameContainer) {
+              frameContainer.style.display = 'block';
+            }
+            window.scrollTo(0, 0);
+            window.location.hash = 'photography';
+            document.body.style.overflow = 'hidden';
+
+            // Highlight Photography link in header
+            document.querySelectorAll('a[href^="#"]').forEach(a => {
+              a.classList.toggle('nav-link-active', a.getAttribute('href') === '#photography');
+            });
+            return;
+          }
+          
+          // If we click any other hash link while photography is visible, restore sections
+          let frameContainer = document.getElementById('photography-frame-container');
+          if (frameContainer && frameContainer.style.display === 'block') {
+            sections.forEach(id => {
+              const el = document.getElementById(id);
+              if (el) el.classList.remove('hidden-view');
+            });
+            const footer = document.querySelector('footer');
+            if (footer) footer.classList.remove('hidden-view');
+            frameContainer.style.display = 'none';
+            document.body.style.overflow = '';
+            
+            // Also reset window location hash so it doesn't stay stuck on #photography
+            if (history.pushState) {
+              history.pushState(null, null, ' ');
+            } else {
+              window.location.hash = '';
+            }
+          }
+
+          const el = document.getElementById(hash.substring(1));
+          if (el && hash !== "#") {
+            e.preventDefault();
+            const tb = document.querySelector('button[aria-label="Toggle menu"]');
+            if (tb && (tb.innerText.includes('X') || tb.innerHTML.includes('svg')) && window.innerWidth < 1024) tb.click();
+            setTimeout(() => {
+              window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: "smooth" });
+            }, 280);
           }
         }
       });
