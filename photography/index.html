@@ -41,5 +41,129 @@
   </head>
   <body>
     <div id="root"></div>
+    <div style="position: fixed; bottom: 0; width: 100%; text-align: center; padding: 10px; font-family: 'Inter', sans-serif; font-size: 11px; color: rgba(255,255,255,0.5); background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); z-index: 50; pointer-events: none; letter-spacing: 0.5px;">
+      * Images displayed in this gallery are compressed for web performance and do not reflect their original quality.
+    </div>
+    <div class="creative-footer">
+      <div class="quote">"Photography takes an instant out of time, altering life by holding it still."</div>
+      <div class="quote-author">— Dorothea Lange</div>
+      <div class="contact-info">
+        Interested in licensing or prints? Enquire at <a href="mailto:photos@anaswar.com">photos@anaswar.com</a>
+      </div>
+      <button id="back-to-top" aria-label="Back to top">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+      </button>
+    </div>
+    <style>
+      header {
+        transition: transform 0.3s ease-in-out !important;
+      }
+      header.hide-header {
+        transform: translateY(-100%);
+      }
+      .creative-footer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px 80px 20px;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.6);
+        font-family: 'Inter', sans-serif;
+        position: relative;
+        z-index: 10;
+        background: transparent;
+      }
+      .creative-footer::before {
+        content: '';
+        width: 40px;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.2);
+        margin-bottom: 30px;
+      }
+      .creative-footer .quote {
+        font-size: 14px;
+        font-weight: 300;
+        font-style: italic;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        max-width: 600px;
+      }
+      .creative-footer .quote-author {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.4);
+        margin-bottom: 30px;
+      }
+      .creative-footer .contact-info {
+        font-size: 12px;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.5);
+        margin-bottom: 35px;
+        letter-spacing: 0.5px;
+      }
+      .creative-footer .contact-info a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        padding-bottom: 2px;
+        transition: all 0.2s ease;
+      }
+      .creative-footer .contact-info a:hover {
+        color: #fff;
+        border-color: #fff;
+      }
+      #back-to-top {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.8);
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      #back-to-top:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-3px);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+    </style>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        let lastScrollY = window.scrollY;
+        const checkHeader = setInterval(() => {
+          const header = document.querySelector('header');
+          if (header) {
+            clearInterval(checkHeader);
+            window.addEventListener('scroll', () => {
+              if (window.scrollY > lastScrollY && window.scrollY > 80) {
+                header.classList.add('hide-header');
+              } else {
+                header.classList.remove('hide-header');
+              }
+              lastScrollY = window.scrollY;
+            });
+            document.addEventListener('mousemove', (e) => {
+              if (e.clientY < 60) {
+                header.classList.remove('hide-header');
+              }
+            });
+          }
+        }, 100);
+
+        const backToTopBtn = document.getElementById('back-to-top');
+        if (backToTopBtn) {
+          backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          });
+        }
+      });
+    </script>
   </body>
 </html>

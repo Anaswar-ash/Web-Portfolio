@@ -626,7 +626,26 @@
       let logoClickCounter = 0, logoTimer;
       document.addEventListener('mousedown', (e) => {
         const path = e.composedPath(); const isLogo = path.some(el => el.innerText && el.innerText.includes('ASH') && el.innerText.includes('DEV'));
-        if (isLogo) { logoClickCounter++; clearTimeout(logoTimer); if (logoClickCounter === 5) { 
+        if (isLogo) { 
+          // If photography frame is open, close it and go to top
+          const frameContainer = document.getElementById('photography-frame-container');
+          if (frameContainer && frameContainer.style.display === 'block') {
+            const sections = ['hero', 'about', 'skills', 'projects', 'experience', 'education', 'certifications', 'hobbies', 'contact'];
+            sections.forEach(id => {
+              const el = document.getElementById(id);
+              if (el) el.classList.remove('hidden-view');
+            });
+            const footer = document.querySelector('footer');
+            if (footer) footer.classList.remove('hidden-view');
+            const btt = document.getElementById('back-to-top');
+            if (btt) btt.classList.remove('hidden-view');
+            frameContainer.style.display = 'none';
+            document.body.style.overflow = '';
+            if (history.pushState) history.pushState(null, null, ' '); else window.location.hash = '';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+
+          logoClickCounter++; clearTimeout(logoTimer); if (logoClickCounter === 5) { 
           const els = document.querySelectorAll('h1, h2, h3, p, span:not(.terminal-cursor)'); const origs = []; els.forEach((el, i) => { origs[i] = el.innerText; if (el.innerText.length > 1) { let b = ""; for(let j=0; j<el.innerText.length; j++) b += Math.random() > 0.5 ? "0" : "1"; el.innerText = b; } });
           setTimeout(() => { els.forEach((el, i) => { el.innerText = origs[i]; }); }, 2500); logoClickCounter = 0; 
         } else { logoTimer = setTimeout(() => { logoClickCounter = 0; }, 4000); }
@@ -656,7 +675,9 @@
             if (el) el.classList.add('hidden-view');
           });
           const footer = document.querySelector('footer');
-          if (footer) footer.classList.add('hidden-view');
+            if (footer) footer.classList.add('hidden-view');
+            const btt = document.getElementById('back-to-top');
+            if (btt) btt.classList.add('hidden-view');
           
           frameContainer.style.display = 'block';
           window.scrollTo(0, 0);
@@ -682,7 +703,9 @@
             if (el) el.classList.remove('hidden-view');
           });
           const footer = document.querySelector('footer');
-          if (footer) footer.classList.remove('hidden-view');
+            if (footer) footer.classList.remove('hidden-view');
+            const btt = document.getElementById('back-to-top');
+            if (btt) btt.classList.remove('hidden-view');
           
           const frameContainer = document.getElementById('photography-frame-container');
           if (frameContainer) frameContainer.style.display = 'none';
@@ -713,6 +736,8 @@
             });
             const footer = document.querySelector('footer');
             if (footer) footer.classList.add('hidden-view');
+            const btt = document.getElementById('back-to-top');
+            if (btt) btt.classList.add('hidden-view');
             
             // Show iframe
             let frameContainer = document.getElementById('photography-frame-container');
@@ -739,6 +764,8 @@
             });
             const footer = document.querySelector('footer');
             if (footer) footer.classList.remove('hidden-view');
+            const btt = document.getElementById('back-to-top');
+            if (btt) btt.classList.remove('hidden-view');
             frameContainer.style.display = 'none';
             document.body.style.overflow = '';
             

@@ -1,0 +1,16 @@
+{
+  "name": "web-portfolio-main",
+  "version": "1.0.0",
+  "description": "A world-class, high-performance professional portfolio designed for the technical intersection of Finance, AI, and Full-Stack Engineering.",
+  "main": "dump_context.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "exifr": "^7.1.3"
+  }
+}
